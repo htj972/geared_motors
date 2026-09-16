@@ -1,0 +1,3 @@
+F:/code/geared_motors/code/cmake-build-debug/CMakeFiles/code.elf.dir
+F:/code/geared_motors/code/cmake-build-debug/CMakeFiles/edit_cache.dir
+F:/code/geared_motors/code/cmake-build-debug/CMakeFiles/rebuild_cache.dir
