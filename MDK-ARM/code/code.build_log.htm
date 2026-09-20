@@ -5,11 +5,11 @@
 <h2>Tool Versions:</h2>
 IDE-Version: ¦ÌVision V5.33.0.0
 Copyright (C) 2020 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: h tj, pi, LIC=X96CK-ZWSH6-DYCV3-A2LT0-6DJAC-LFKJM
+License Information: H TJ, 1, LIC=KRMW3-AMH3D-WFMI7-EACJ2-DXARI-XCU52
  
 Tool Versions:
 Toolchain:       MDK-ARM Plus  Version: 5.33.0.0
-Toolchain Path:  D:\MDK\ARM\ARMCC\Bin
+Toolchain Path:  G:\Keil_v5\ARM\ARMCC\Bin
 C Compiler:      Armcc.exe V5.06 update 7 (build 960)
 Assembler:       Armasm.exe V5.06 update 7 (build 960)
 Linker/Locator:  ArmLink.exe V5.06 update 7 (build 960)
@@ -21,13 +21,22 @@ Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.8.0
 Dialog DLL:      TCM.DLL V1.48.0.0
  
 <h2>Project:</h2>
-F:\code\geared_motors\code\MDK-ARM\code.uvprojx
-Project File Date:  09/16/2026
+H:\geared_motors\MDK-ARM\code.uvprojx
+Project File Date:  09/19/2026
 
 <h2>Output:</h2>
-*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'D:\MDK\ARM\ARMCC\Bin'
+*** Using Compiler 'V5.06 update 7 (build 960)', folder: 'G:\Keil_v5\ARM\ARMCC\Bin'
 Build target 'code'
-"code\code.axf" - 0 Error(s), 0 Warning(s).
+compiling tim.c...
+../Core/Src/tim.c(167): warning:  #223-D: function "sprintf" declared implicitly
+  	sprintf(data,"Y=%.1lfX+%.1lfx+%.1lf",an,bn,cn);
+../Core/Src/tim.c(176): warning:  #223-D: function "sscanf" declared implicitly
+  	if (sscanf(data, "y=%fxx+%fx+%f", &an, &bn, &cn) == 3)
+../Core/Src/tim.c: 2 warnings, 0 errors
+linking...
+Program Size: Code=23892 RO-data=2464 RW-data=520 ZI-data=9696  
+FromELF: creating hex file...
+"code\code.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -44,14 +53,14 @@ Package Vendor: Keil
 
 <h2>Collection of Component include folders:</h2>
   .\RTE\_code
-  D:\MDK\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
-  D:\MDK\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include
+  G:\Keil_v5\Arm\Packs\ARM\CMSIS\5.7.0\CMSIS\Core\Include
+  G:\Keil_v5\Arm\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include
 
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.4.0
       Include file:  CMSIS\Core\Include\tz_context.h
-Build Time Elapsed:  00:00:01
+Build Time Elapsed:  00:00:02
 </pre>
 </body>
 </html>

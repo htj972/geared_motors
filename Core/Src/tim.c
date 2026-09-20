@@ -43,9 +43,9 @@ void MX_TIM2_Init(void)
   htim2.Instance = TIM2;
   htim2.Init.Prescaler = 4;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 65535;
+  htim2.Init.Period = 1600;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
   sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
@@ -59,7 +59,7 @@ void MX_TIM2_Init(void)
   {
     Error_Handler();
   }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
   sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
   if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
   {
@@ -128,5 +128,73 @@ void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef* tim_encoderHandle)
 }
 
 /* USER CODE BEGIN 1 */
+
+volatile float Encoder_Overflow = 0;
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+    if (htim->Instance == TIM2)
+    {
+        if (__HAL_TIM_IS_TIM_COUNTING_DOWN(htim))
+        {
+            // 反转下溢：0 -> 65535
+            Encoder_Overflow--;
+        }
+        else
+        {
+            // 正转溢出：65535 -> 0
+            Encoder_Overflow++;
+        }
+    }
+}
+
+float get_Encoder()
+{
+	return Encoder_Overflow;
+}
+
+void clear_Encoder()
+{
+	Encoder_Overflow=0;
+	htim2.Instance->CNT=0;
+}
+
+float an=0.2,bn=1.1,cn=0.6;
+uint8_t Equation_flag =0;
+
+uint8_t get_Equation(char* data)
+{
+	sprintf(data,"Y=%.1lfX+%.1lfx+%.1lf",an,bn,cn);
+	uint8_t ret=Equation_flag;
+	Equation_flag=0;
+	return ret;
+}
+
+uint8_t set_Equation(char* data)
+{
+	/*y=0.2xx+1.2x+2.1*/
+	if (sscanf(data, "y=%fxx+%fx+%f", &an, &bn, &cn) == 3)
+	{
+		return 0;
+	}
+	else
+	{
+			// 解析失败
+		return 1;
+	}
+}
+
+float get_Distance()
+{
+	float x=htim2.Instance->CNT/1600.0+get_Encoder(); 	
+	float y;
+    y = an * x * x
+      + bn * x
+      + cn;
+
+    return y; 	 	
+}
+
+
 
 /* USER CODE END 1 */

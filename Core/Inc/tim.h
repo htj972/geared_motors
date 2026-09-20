@@ -41,7 +41,11 @@ extern TIM_HandleTypeDef htim2;
 void MX_TIM2_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+float get_Encoder(void);
+void clear_Encoder(void);
+uint8_t get_Equation(char* data);
+uint8_t set_Equation(char* data);
+float get_Distance(void);
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

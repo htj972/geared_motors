@@ -26,6 +26,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "OLED.h"
+#include "tim.h"
 
 /* USER CODE END Includes */
 
@@ -148,10 +149,24 @@ void StartTask_LOGI(void const * argument)
 			HAL_GPIO_WritePin(OA_GPIO_Port,OA_Pin,GPIO_PIN_RESET);
 			HAL_GPIO_WritePin(OB_GPIO_Port,OB_Pin,GPIO_PIN_SET);
 		}
+		else if((HAL_GPIO_ReadPin(DOWN_GPIO_Port,DOWN_Pin)==GPIO_PIN_RESET)&&
+			(HAL_GPIO_ReadPin(UP_GPIO_Port,UP_Pin)==GPIO_PIN_RESET))
+		{
+			HAL_GPIO_WritePin(OA_GPIO_Port,OA_Pin,GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(OB_GPIO_Port,OB_Pin,GPIO_PIN_RESET);
+			clear_Encoder();
+			while(!((HAL_GPIO_ReadPin(DOWN_GPIO_Port,DOWN_Pin)==GPIO_PIN_RESET)&&
+			(HAL_GPIO_ReadPin(UP_GPIO_Port,UP_Pin)==GPIO_PIN_RESET)))
+			{
+				osDelay(100);
+			}
+			osDelay(200);
+			clear_Encoder();
+		}
 		else
 		{
 			HAL_GPIO_WritePin(OA_GPIO_Port,OA_Pin,GPIO_PIN_RESET);
-			HAL_GPIO_WritePin(OA_GPIO_Port,OA_Pin,GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(OB_GPIO_Port,OB_Pin,GPIO_PIN_RESET);
 		}
   }
   /* USER CODE END StartTask_LOGI */
@@ -167,19 +182,33 @@ void StartTask_LOGI(void const * argument)
 void StartTask_OLED(void const * argument)
 {
   /* USER CODE BEGIN StartTask_OLED */
-	HAL_Delay(10);
+
+	osDelay(10);
   OLED_Init();
 	OLED_Fill(0xff);
 	OLED_Fill(0x00);
-	
+	clear_Encoder();
 	char str[15];
-	uint16_t i=0;
+	sprintf(str,(char*)"Encoder :%5d",htim2.Instance->CNT);
+	OLED_ShowStr(0,0,str,2);
+	sprintf(str,(char*)"Rounds  :%5.0lf",get_Encoder());
+	OLED_ShowStr(0,2,str,2);
+	get_Equation(str);
+	OLED_ShowStr(0,4,str,2);
+	sprintf(str,(char*)"Distance:%7.1lf",get_Distance());
+	OLED_ShowStr(0,6,str,2);
   /* Infinite loop */
   for(;;)
   {
-		sprintf(str,"data:%d",i++);
-		OLED_ShowStr(0,0,str,1);
-    osDelay(1000);
+		sprintf(str,(char*)"%5d",htim2.Instance->CNT);
+		OLED_ShowStr(72,0,str,2);
+		sprintf(str,(char*)"%5.0lf",get_Encoder());
+		OLED_ShowStr(72,2,str,2);
+		if(get_Equation(str))
+			OLED_ShowStr(0,4,str,2);
+		sprintf(str,(char*)"%7.1lf",get_Distance());
+		OLED_ShowStr(72,6,str,2);
+    osDelay(200);
   }
   /* USER CODE END StartTask_OLED */
 }
