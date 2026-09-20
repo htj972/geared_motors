@@ -41,9 +41,9 @@ void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 4;
+  htim2.Init.Prescaler = 1;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 1600;
+  htim2.Init.Period = 4200;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
   sConfig.EncoderMode = TIM_ENCODERMODE_TI12;
@@ -175,6 +175,7 @@ uint8_t set_Equation(char* data)
 	/*y=0.2xx+1.2x+2.1*/
 	if (sscanf(data, "y=%fxx+%fx+%f", &an, &bn, &cn) == 3)
 	{
+		Equation_flag=1;
 		return 0;
 	}
 	else
@@ -186,7 +187,7 @@ uint8_t set_Equation(char* data)
 
 float get_Distance()
 {
-	float x=htim2.Instance->CNT/1600.0+get_Encoder(); 	
+	float x=htim2.Instance->CNT/(float)htim2.Init.Period+get_Encoder(); 	
 	float y;
     y = an * x * x
       + bn * x

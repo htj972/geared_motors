@@ -27,6 +27,7 @@
 /* USER CODE BEGIN Includes */
 #include "OLED.h"
 #include "tim.h"
+#include "usbd_cdc_if.h"
 
 /* USER CODE END Includes */
 
@@ -51,6 +52,7 @@
 /* USER CODE END Variables */
 osThreadId LOGIHandle;
 osThreadId OLED_DISPLAYHandle;
+osThreadId USB_CDCHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -59,6 +61,7 @@ osThreadId OLED_DISPLAYHandle;
 
 void StartTask_LOGI(void const * argument);
 void StartTask_OLED(void const * argument);
+void StartTask_USB_CDC(void const * argument);
 
 extern void MX_USB_DEVICE_Init(void);
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
@@ -113,6 +116,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of OLED_DISPLAY */
   osThreadDef(OLED_DISPLAY, StartTask_OLED, osPriorityIdle, 0, 128);
   OLED_DISPLAYHandle = osThreadCreate(osThread(OLED_DISPLAY), NULL);
+
+  /* definition and creation of USB_CDC */
+  osThreadDef(USB_CDC, StartTask_USB_CDC, osPriorityIdle, 0, 128);
+  USB_CDCHandle = osThreadCreate(osThread(USB_CDC), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -205,12 +212,36 @@ void StartTask_OLED(void const * argument)
 		sprintf(str,(char*)"%5.0lf",get_Encoder());
 		OLED_ShowStr(72,2,str,2);
 		if(get_Equation(str))
+		{
 			OLED_ShowStr(0,4,str,2);
+			uint8_t l=strlen(str);
+			CDC_Transmit_FS((uint8_t*)str,l);
+		}
 		sprintf(str,(char*)"%7.1lf",get_Distance());
 		OLED_ShowStr(72,6,str,2);
     osDelay(200);
   }
   /* USER CODE END StartTask_OLED */
+}
+
+/* USER CODE BEGIN Header_StartTask_USB_CDC */
+/**
+* @brief Function implementing the USB_CDC thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTask_USB_CDC */
+void StartTask_USB_CDC(void const * argument)
+{
+  /* USER CODE BEGIN StartTask_USB_CDC */
+	uint8_t str[5]="123";
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1000);
+		//CDC_Transmit_FS(str,3);
+  }
+  /* USER CODE END StartTask_USB_CDC */
 }
 
 /* Private application code --------------------------------------------------*/

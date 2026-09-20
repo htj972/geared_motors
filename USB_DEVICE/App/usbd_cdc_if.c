@@ -22,7 +22,7 @@
 #include "usbd_cdc_if.h"
 
 /* USER CODE BEGIN INCLUDE */
-
+#include "tim.h"
 /* USER CODE END INCLUDE */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -259,6 +259,9 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
+	
+	send_usb_to_data(Buf, (uint8_t)*Len);
+	
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   return (USBD_OK);
@@ -291,6 +294,83 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 }
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_IMPLEMENTATION */
+
+uint8_t USB_CDC_data[64];
+void send_usb_to_data(uint8_t* Buf, uint16_t Len)
+{
+	if(Len>64)Len=64;
+	for(uint8_t i=0;i<Len;i++)
+	{
+		USB_CDC_data[i+1]=Buf[i];
+	}
+	set_Equation((char*)&USB_CDC_data[1]);
+	USB_CDC_data[0]=Len;
+	//Flash_Write(0,USB_CDC_data,Len+1);
+}
+
+
+// 定义用户数据存储起始地址，示例为STM32F103C8T6 (64KB Flash) 的最后一页
+// 请根据实际芯片型号和链接脚本调整此地址，确保不与代码段冲突
+#define FLASH_USER_START_ADDR   0x0800Fa00  // 假设最后一页起始地址，需自行确认
+/**
+ * @brief 向内部Flash写入数据
+ * @param addr: 写入起始地址，必须是页对齐或至少是写入宽度的倍数
+ * @param data: 数据缓冲区指针
+ * @param len: 数据长度(字节)
+ * @retval HAL_StatusTypeDef
+ */
+HAL_StatusTypeDef Flash_Write(uint32_t addr, uint8_t *data, uint16_t len)
+{
+    HAL_StatusTypeDef status = HAL_OK;
+    uint32_t page_error = 0;
+    FLASH_EraseInitTypeDef erase_init;
+    
+    // 1. 解锁Flash
+    HAL_FLASH_Unlock();
+    
+    // 2. 擦除包含目标地址的页
+    // 注意：这里简单处理为擦除起始地址所在的页。如果数据跨页，需要循环擦除所有涉及的页
+    erase_init.TypeErase = FLASH_TYPEERASE_PAGES;
+    erase_init.PageAddress = addr;
+    erase_init.NbPages = 1; // 如果数据跨页，需计算页数并修改此处
+    
+    status = HAL_FLASHEx_Erase(&erase_init, &page_error);
+    if (status != HAL_OK) {
+        HAL_FLASH_Lock();
+        return status;
+    }
+    
+    // 3. 写入数据
+    // STM32F1通常使用半字(16-bit)或字(32-bit)编程。这里演示按字(32-bit)写入，需保证地址4字节对齐
+    // 如果地址不对齐或长度为奇数，建议填充或使用半字写入
+    uint32_t i = 0;
+    uint32_t *p_data = (uint32_t *)data;
+        // 简单起见，假设len是4的倍数且地址4字节对齐。实际应用中需处理非对齐情况
+    for (i = 0; i < len / 4; i++) {
+        status = HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, addr + i * 4, p_data[i]);
+        if (status != HAL_OK) {
+            break;
+        }
+    }
+    
+    // 4. 上锁Flash
+    HAL_FLASH_Lock();
+    
+    return status;
+}
+
+/**
+ * @brief 从内部Flash读取数据
+ * @param addr: 读取起始地址
+ * @param data: 数据缓冲区指针
+ * @param len: 数据长度(字节)
+ */
+void Flash_Read(uint32_t addr, uint8_t *data, uint16_t len)
+{
+    // 直接内存拷贝，Flash可读性同RAM
+    memcpy(data, (void *)addr, len);
+}
+
 
 /* USER CODE END PRIVATE_FUNCTIONS_IMPLEMENTATION */
 

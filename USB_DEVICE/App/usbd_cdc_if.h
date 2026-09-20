@@ -108,7 +108,10 @@ extern USBD_CDC_ItfTypeDef USBD_Interface_fops_FS;
 uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len);
 
 /* USER CODE BEGIN EXPORTED_FUNCTIONS */
-
+void send_usb_to_data(uint8_t* Buf, uint16_t Len);
+extern uint8_t USB_CDC_data[64];
+HAL_StatusTypeDef Flash_Write(uint32_t addr, uint8_t *data, uint16_t len);
+void Flash_Read(uint32_t addr, uint8_t *data, uint16_t len);
 /* USER CODE END EXPORTED_FUNCTIONS */
 
 /**
