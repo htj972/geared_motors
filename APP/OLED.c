@@ -42,7 +42,7 @@ void WriteDat(unsigned char I2C_Data)//data
 }
 
 
-uint8_t OLED_Init(void)
+void OLED_Init(void)
 {
 //    int wait_time=255;
 //    IIC_Start();

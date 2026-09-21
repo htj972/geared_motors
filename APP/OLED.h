@@ -25,7 +25,7 @@ extern const unsigned char F8X16[];
 
 void WriteCmd(unsigned char I2C_Command);
 void WriteDat(unsigned char I2C_Data);
-uint8_t	 OLED_Init(void);
+void	 OLED_Init(void);
 void OLED_SetPos(unsigned char x, unsigned char y);
 void OLED_Fill(unsigned char fill_Data);
 void OLED_CLS(void);

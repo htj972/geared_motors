@@ -161,6 +161,7 @@ void clear_Encoder()
 
 float an=0.2,bn=1.1,cn=0.6;
 uint8_t Equation_flag =0;
+#include "AT24C16.h"
 
 uint8_t get_Equation(char* data)
 {
@@ -176,6 +177,10 @@ uint8_t set_Equation(char* data)
 	if (sscanf(data, "y=%fxx+%fx+%f", &an, &bn, &cn) == 3)
 	{
 		Equation_flag=1;
+		FormulaParam.a=an;
+		FormulaParam.b=bn;
+		FormulaParam.c=cn;
+		
 		return 0;
 	}
 	else
@@ -184,6 +189,22 @@ uint8_t set_Equation(char* data)
 		return 1;
 	}
 }
+
+void set_Equation_a(float data)
+{
+	an=data;
+}
+
+void set_Equation_b(float data)
+{
+	bn=data;
+}
+	
+void set_Equation_c(float data)
+{
+	cn=data;
+}
+
 
 float get_Distance()
 {

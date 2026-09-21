@@ -28,6 +28,7 @@
 #include "OLED.h"
 #include "tim.h"
 #include "usbd_cdc_if.h"
+#include "AT24C16.h"
 
 /* USER CODE END Includes */
 
@@ -195,6 +196,14 @@ void StartTask_OLED(void const * argument)
 	OLED_Fill(0xff);
 	OLED_Fill(0x00);
 	clear_Encoder();
+	AT24C16_IsReady();
+	if(!Formula_Load())
+	{
+		Formula_ResetDefault();
+	}
+	set_Equation_a(get_Formula_a());
+	set_Equation_b(get_Formula_b());
+	set_Equation_c(get_Formula_c());
 	char str[15];
 	sprintf(str,(char*)"Encoder :%5d",htim2.Instance->CNT);
 	OLED_ShowStr(0,0,str,2);
@@ -216,6 +225,7 @@ void StartTask_OLED(void const * argument)
 			OLED_ShowStr(0,4,str,2);
 			uint8_t l=strlen(str);
 			CDC_Transmit_FS((uint8_t*)str,l);
+			Formula_Save();
 		}
 		sprintf(str,(char*)"%7.1lf",get_Distance());
 		OLED_ShowStr(72,6,str,2);

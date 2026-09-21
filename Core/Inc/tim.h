@@ -45,6 +45,9 @@ float get_Encoder(void);
 void clear_Encoder(void);
 uint8_t get_Equation(char* data);
 uint8_t set_Equation(char* data);
+void set_Equation_a(float data);
+void set_Equation_b(float data);
+void set_Equation_c(float data);
 float get_Distance(void);
 /* USER CODE END Prototypes */
 

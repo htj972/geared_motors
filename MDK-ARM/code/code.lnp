@@ -35,6 +35,7 @@
 "code\usbd_ioreq.o"
 "code\usbd_cdc.o"
 "code\oled.o"
+"code\at24c16.o"
 "code\croutine.o"
 "code\event_groups.o"
 "code\list.o"
